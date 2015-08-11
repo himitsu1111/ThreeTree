@@ -24,6 +24,7 @@ struct TMyStr
 	int Chislo;
 	String Komment;
 };
+//new
 //class TNodeOperations: public TForm1
 //{
 //	public:
