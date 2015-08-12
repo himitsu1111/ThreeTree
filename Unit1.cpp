@@ -24,7 +24,6 @@ struct TMyStr
 	int Chislo;
 	String Komment;
 };
-//new
 //class TNodeOperations: public TForm1
 //{
 //	public:
@@ -144,6 +143,8 @@ void __fastcall TForm1::FormCreate(TObject *Sender)
 	Height = 638;
 	Width = 625;
 	//BorderStyle = bsSingle;
+	struktStanka->Caption = "";
+	Panel3->SendToBack();
 	AnsiString DataPath = GetCurrentDir();
 	ABSDatabase1->DatabaseFileName = DataPath + "\\TehDerevo.ABS";
 	TreeView1->Items->Clear();
@@ -157,7 +158,7 @@ void __fastcall TForm1::FormCreate(TObject *Sender)
 	ABSQuery1->Close();
 	TTreeNode* siblingNode = TreeView1->Items->GetFirstNode(); //создается первый НОД
 	while (siblingNode)
-	{                                   // 
+	{
 		ABSQuery1->SQL->Text = "select Nomer from Ceh where id_TB=(select id from TB where Name='" + siblingNode->Text + "')";
 		ABSQuery1->Active = true;
 		while (!ABSQuery1->Eof)
@@ -318,7 +319,8 @@ void __fastcall TForm1::Button2Click(TObject *Sender)
 
 void __fastcall TForm1::N2Click(TObject *Sender)  //ОТКРЫТЬ++++++++++++++++++
 {
-	TreeView2->SendToBack();
+
+//	TreeView2->SendToBack();
 	AnsiString DataPath = GetCurrentDir();
 	ABSDatabase1->DatabaseFileName = DataPath + "\\TehDerevo.ABS";
 	//ID инвентарного, полученный из тривью1
@@ -347,12 +349,54 @@ void __fastcall TForm1::N2Click(TObject *Sender)  //ОТКРЫТЬ++++++++++++++++++
 			siblingNode = siblingNode->getNextSibling();
 			ABSQuery1->Close();
 		}
+		//новая часть с 10.08.2015+++++++++
+
+		siblingNode = TreeView2->Items->GetFirstNode(); // - ноды группы СИСТЕМА
+		TTreeNode* childNode; // - ноды группы ПОДСИСТЕМА
+
+		while (siblingNode)
+		{
+			if (siblingNode->getFirstChild()) //если есть потомок у первой группы нодов
+			{
+				childNode = siblingNode->getFirstChild();
+				while (childNode) //перебор второй группы нодов
+				{
+					ABSQuery1->SQL->Text = "select Naim from Strukt_3 where id IN(select id_S3 from Strukturs_23 where id_strukturs=(select id from Strukturs where id_Inv=(select id from INV where I_N='"
+					+ TreeView1->GetNodeAt(K,Z)->Text + "') and id_S2=(select id from Strukt_2 where Naim='" + childNode->Text + "') and id_S1=(select id from Strukt where Naim='" + siblingNode->Text + "')))";
+					ABSQuery1->Active = true;
+					while (!ABSQuery1->Eof)
+					{
+						TreeView2->Items->AddChild(childNode, ABSQuery1->FieldByName("Naim")->AsString)->SelectedIndex = 3;
+						ABSQuery1->Next();    //заполняются ноды группы ИНВЕНТАРНЫХ
+					}
+					childNode = childNode->getNextSibling();
+				}
+			}
+			siblingNode = siblingNode->getNextSibling();
+		}
+		ABSQuery1->Close();
+
+		//конец новой части++++++++++++++++
 	}
 	else
 	{
 		ShowMessage("Не выбран инвентарный!");
 	}
 	Metka = TreeView1->Selected;
+
+	TTreeNode * level_4;
+	TTreeNode * level_3;
+	TTreeNode * level_2;
+	TTreeNode * level_1;
+
+	level_3 = Metka->Parent;
+	level_2 = level_3->Parent;
+	level_1 = level_2->Parent;
+	struktStanka->Caption = "Структура станка: " + level_3->Text /*модель станка */+ ", "
+	+ Metka->Text + /*инвентарный */", " + level_2->Text;
+
+	Panel3->Visible = true;
+	TreeView2->BringToFront();
 }
 //---------------------------------------------------------------------------
 
@@ -623,7 +667,7 @@ void __fastcall TForm1::N6Click(TObject *Sender)//ИЗМЕНИТЬ
 			;
 		}
 	Button3->Caption = "Изменить";
-
+  //  delete Info;
 //	ChangerK->ChangeNode(Node, TreeView1->GetNodeAt(K,Z)->SelectedIndex);
 }
 //---------------------------------------------------------------------------
@@ -1041,12 +1085,19 @@ void __fastcall TForm1::TreeView2MouseDown(TObject *Sender, TMouseButton Button,
 		NOpen->Visible = false;
 		NDelete->Visible = false;
 	}
-    if (TreeView2->Selected->SelectedIndex==2)
+	if (TreeView2->Selected->SelectedIndex==2)
+	{
+		NPodkat->Visible = true;
+		NOpen->Visible = false;
+		NDelete->Visible = true;
+	}
+    if (TreeView2->Selected->SelectedIndex==3)
 	{
 		NPodkat->Visible = false;
 		NOpen->Visible = true;
 		NDelete->Visible = true;
 	}
+
 		
 }
 //---------------------------------------------------------------------------
@@ -1100,27 +1151,56 @@ void __fastcall TForm1::N9Click(TObject *Sender)//КОПИРОВАТЬ СТРУКТУРУ
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TForm1::NPodkatClick(TObject *Sender)//добавление ПОДКАТЕГОРИИ в ТВ-2
+void __fastcall TForm1::NPodkatClick(TObject *Sender)//добавление ПОДКАТЕГОРИИ в ТриВью-2
 {
-	//
-	Panel3->Visible = true;
-	Panel4->Caption = TreeView2->Selected->Text;
-	ABSQuery2->SQL->Clear();
-	ABSQuery2->SQL->Text = "select Naim from Strukt_2";
-	ABSQuery2->Active = true;
-	while (!ABSQuery2->Eof)
+								  //только включает панель выбора подкатегории
+	NomerGrupp = TreeView2->Selected->SelectedIndex;
+	switch (NomerGrupp)
 	{
-		ComboBox2->Items->Add(ABSQuery2->FieldByName("Naim")->AsString);
-		ABSQuery2->Next();
+		case 1:{
+				Panel3->Visible = true;
+				Panel4->Caption = TreeView2->Selected->Text;
+				ABSQuery2->SQL->Clear();
+				ABSQuery2->SQL->Text = "select Naim from Strukt_2";
+				ABSQuery2->Active = true;
+					while (!ABSQuery2->Eof)
+					{
+						ComboBox2->Items->Add(ABSQuery2->FieldByName("Naim")->AsString);
+						ABSQuery2->Next();
+					}
+					ABSQuery2->Close();
+
+			   }
+			break;
+		case 2:{
+                Panel3->Visible = true;
+				Panel4->Caption = TreeView2->Selected->Text;
+				ABSQuery2->SQL->Clear();
+				ABSQuery2->SQL->Text = "select Naim from Strukt_3";
+				ABSQuery2->Active = true;
+					while (!ABSQuery2->Eof)
+					{
+						ComboBox2->Items->Add(ABSQuery2->FieldByName("Naim")->AsString);
+						ABSQuery2->Next();
+					}
+					ABSQuery2->Close();
+			   }
+
+			break;
+
+
+	default:
+		;
 	}
-	ABSQuery2->Close();
+
+	TreeView2->SendToBack();
 
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TForm1::NOpenClick(TObject *Sender)//открыть ПГДобразные данные
 {
-	//	
+	//
 }
 //---------------------------------------------------------------------------
 
@@ -1135,23 +1215,60 @@ void __fastcall TForm1::Button6Click(TObject *Sender)//ОТМЕНА/СБРОС ВСЕГО в ТВ-2
 void __fastcall TForm1::Button5Click(TObject *Sender)
 {
 	//добавление в таблицы от ТриВью2+++++++++++++++++++++++++++++++++++++++
-	ABSQuery1->SQL->Clear();
-	ABSQuery1->SQL->Text = "INSERT INTO Strukturs (id_Inv, id_S2, id_S1) values ((select id from INV where I_N='"
-	+ Metka->Text + "'), (select id from Strukt_2 where Naim='"
-	+ ComboBox2->Text + "'), (select id from Strukt where Naim='" + TreeView2->Selected->Text + "'))";
-	ABSQuery1->ExecSQL();
-	ABSQuery1->Close();
-	TreeView2->Items->AddChild(TreeView2->Selected, ComboBox2->Text)->SelectedIndex = 2;
-	Panel3->Visible = false;
-	ComboBox2->Clear();
+	
+	String prev_node = TreeView2->Selected->Parent->Text; //ноды 1й группы, для SQL запроса.
+	NomerGrupp = TreeView2->Selected->SelectedIndex;
+
+	switch (NomerGrupp)
+	{
+		case 1:{
+				ABSQuery1->SQL->Clear();
+				ABSQuery1->SQL->Text = "INSERT INTO Strukturs (id_Inv, id_S2, id_S1) values ((select id from INV where I_N='"
+				+ Metka->Text + "'), (select id from Strukt_2 where Naim='"
+				+ ComboBox2->Text + "'), (select id from Strukt where Naim='" + TreeView2->Selected->Text + "'))";
+				ABSQuery1->ExecSQL();
+				ABSQuery1->Close();
+				TreeView2->Items->AddChild(TreeView2->Selected, ComboBox2->Text)->SelectedIndex = 2;
+				Panel3->Visible = false;
+				ComboBox2->Clear();
+
+			   }
+			break;
+		case 2:{
+                ABSQuery1->SQL->Clear();
+				ABSQuery1->SQL->Text =
+"INSERT INTO Strukturs_23 (id_strukturs, id_S2, id_S3) values ((select id from Strukturs where id_Inv=(select id from INV where I_N='"
+				+ Metka->Text + "') and id_S2=(select id from Strukt_2 where Naim='"
+				+ TreeView2->Selected->Text + "') and (select id from Strukt where Naim='" + prev_node + "')), (select id from Strukt_2 where Naim='"
+				+ TreeView2->Selected->Text + "'), (select id from Strukt_3 where Naim='" + ComboBox2->Text + "'))";
+				ABSQuery1->ExecSQL();
+				ABSQuery1->Close();
+				TreeView2->Items->AddChild(TreeView2->Selected, ComboBox2->Text)->SelectedIndex = 3;
+				Panel3->Visible = false;
+				ComboBox2->Clear();
+
+			   }
+			break;
+
+	}
+    Panel3->Visible = true;
+	TreeView2->BringToFront();
 }
 //---------------------------------------------------------------------------
 
 void __fastcall TForm1::NDeleteClick(TObject *Sender)//УДАЛЕНИЕ из ТВ-2
 {
 	//
-	if (MessageDlg("Действительно удалить " + TreeView2->Selected->Text + "?", mtWarning, mbOKCancel,0)==mrOk)
+	if (MessageDlg("Действительно удалить " + TreeView2->Selected->Text + "?", mtWarning, mbOKCancel,0)==mrOk && TreeView2->Selected->SelectedIndex==2)
 	{
+		ABSQuery1->SQL->Clear();
+		ABSQuery1->SQL->Text = "delete from Strukturs_23 where id_strukturs=(select id from Strukturs where id_S2=(select id from Strukt_2 where Naim='"
+		+ TreeView2->Selected->Text + "') and id_Inv=(select id from INV where I_N='"
+		+ Metka->Text + "') and id_S1=(select id from Strukt where Naim='"
+		+ TreeView2->Selected->Parent->Text + "'))";
+		ABSQuery1->ExecSQL();
+		ABSQuery1->Close();
+
 		ABSQuery1->SQL->Clear();
 		ABSQuery1->SQL->Text = "delete from Strukturs where id_S2=(select id from Strukt_2 where Naim='"
 		+ TreeView2->Selected->Text + "') and id_Inv=(select id from INV where I_N='" + Metka->Text + "')";
@@ -1160,6 +1277,21 @@ void __fastcall TForm1::NDeleteClick(TObject *Sender)//УДАЛЕНИЕ из ТВ-2
 
 		TreeView2->Selected->Delete();
 	}
+
+	if (MessageDlg("Действительно удалить " + TreeView2->Selected->Text + "?", mtWarning, mbOKCancel,0)==mrOk && TreeView2->Selected->SelectedIndex==3)
+	{
+		ABSQuery1->SQL->Clear();
+		ABSQuery1->SQL->Text = "delete from Strukturs_23 where id_strukturs=(select id from Strukturs where id_S2=(select id from Strukt_2 where Naim='"
+		+ TreeView2->Selected->Text + "') and id_Inv=(select id from INV where I_N='"
+		+ Metka->Text + "') and id_S1=(select id from Strukt where Naim='"
+		+ TreeView2->Selected->Parent->Text + "'))";
+		ABSQuery1->ExecSQL();
+		ABSQuery1->Close();
+
+		TreeView2->Selected->Delete();
+	}
+
+
 		
 }
 //---------------------------------------------------------------------------
@@ -1195,7 +1327,7 @@ void __fastcall TForm1::Button7Click(TObject *Sender)
 		Button7->Caption = Z->Import(Name.c_str(),1,"Точка: ");
 
 
-		delete (ImpFromTxt*) Z;
+		delete Z;
 		Memo1->Text;
 	}
 }

@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = #1057#1052#1058#1057' '#1089#1090#1072#1085#1082#1086#1074' '#1089' '#1063#1055#1059
-  ClientHeight = 709
+  ClientHeight = 822
   ClientWidth = 1083
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
@@ -17,76 +17,13 @@ object Form1: TForm1
   TextHeight = 13
   object TreeView2: TTreeView
     Left = 0
-    Top = 346
+    Top = 368
     Width = 275
-    Height = 241
+    Height = 219
     Indent = 19
     PopupMenu = PopupMenu2
     TabOrder = 1
     OnMouseDown = TreeView2MouseDown
-  end
-  object Panel3: TPanel
-    Left = 0
-    Top = 346
-    Width = 275
-    Height = 241
-    TabOrder = 6
-    Visible = False
-    object GroupBox2: TGroupBox
-      Left = 16
-      Top = 8
-      Width = 241
-      Height = 113
-      TabOrder = 0
-      object ComboBox2: TComboBox
-        Left = 88
-        Top = 68
-        Width = 137
-        Height = 21
-        Style = csDropDownList
-        ItemHeight = 13
-        TabOrder = 0
-      end
-      object StaticText1: TStaticText
-        Left = 20
-        Top = 69
-        Width = 58
-        Height = 17
-        Caption = #1044#1086#1073#1072#1074#1080#1090#1100':'
-        TabOrder = 1
-      end
-      object Panel4: TPanel
-        Left = 17
-        Top = 19
-        Width = 208
-        Height = 32
-        Font.Charset = DEFAULT_CHARSET
-        Font.Color = clWindowText
-        Font.Height = -19
-        Font.Name = 'Tahoma'
-        Font.Style = []
-        ParentFont = False
-        TabOrder = 2
-      end
-    end
-    object Button5: TButton
-      Left = 16
-      Top = 128
-      Width = 98
-      Height = 25
-      Caption = #1044#1086#1073#1072#1074#1080#1090#1100
-      TabOrder = 1
-      OnClick = Button5Click
-    end
-    object Button6: TButton
-      Left = 152
-      Top = 128
-      Width = 75
-      Height = 25
-      Caption = #1054#1090#1084#1077#1085#1072
-      TabOrder = 2
-      OnClick = Button6Click
-    end
   end
   object TreeView1: TTreeView
     Left = 0
@@ -317,6 +254,76 @@ object Form1: TForm1
     Height = 267
     Indent = 19
     TabOrder = 11
+  end
+  object Panel3: TPanel
+    Left = 0
+    Top = 346
+    Width = 275
+    Height = 241
+    TabOrder = 6
+    object GroupBox2: TGroupBox
+      Left = 16
+      Top = 46
+      Width = 241
+      Height = 113
+      TabOrder = 0
+      object ComboBox2: TComboBox
+        Left = 88
+        Top = 68
+        Width = 137
+        Height = 21
+        Style = csDropDownList
+        ItemHeight = 13
+        TabOrder = 0
+      end
+      object StaticText1: TStaticText
+        Left = 20
+        Top = 69
+        Width = 58
+        Height = 17
+        Caption = #1044#1086#1073#1072#1074#1080#1090#1100':'
+        TabOrder = 1
+      end
+      object Panel4: TPanel
+        Left = 17
+        Top = 19
+        Width = 208
+        Height = 32
+        Font.Charset = DEFAULT_CHARSET
+        Font.Color = clWindowText
+        Font.Height = -19
+        Font.Name = 'Tahoma'
+        Font.Style = []
+        ParentFont = False
+        TabOrder = 2
+      end
+    end
+    object Button5: TButton
+      Left = 16
+      Top = 166
+      Width = 98
+      Height = 25
+      Caption = #1044#1086#1073#1072#1074#1080#1090#1100
+      TabOrder = 1
+      OnClick = Button5Click
+    end
+    object Button6: TButton
+      Left = 152
+      Top = 166
+      Width = 75
+      Height = 25
+      Caption = #1054#1090#1084#1077#1085#1072
+      TabOrder = 2
+      OnClick = Button6Click
+    end
+    object struktStanka: TStaticText
+      Left = 14
+      Top = 7
+      Width = 187
+      Height = 54
+      Caption = 'struktStanka'
+      TabOrder = 3
+    end
   end
   object ABSDatabase1: TABSDatabase
     CurrentVersion = '7.30 '

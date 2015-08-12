@@ -75,6 +75,7 @@ __published:	// IDE-managed Components
 	TOpenDialog *OpenDialog1;
 	TTreeView *TreeView4;
 	TTreeView *TreeView5;
+	TStaticText *struktStanka;
 	void __fastcall FormCreate(TObject *Sender);
 	void __fastcall Button1Click(TObject *Sender);
 	void __fastcall Button2Click(TObject *Sender);
